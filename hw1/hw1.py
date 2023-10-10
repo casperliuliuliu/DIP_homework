@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageOps, ImageDraw, ImageFilter
 from math import exp, log
 import numpy as np
 class ImageEditorApp:
@@ -27,7 +27,6 @@ class ImageEditorApp:
         self.b_label.grid(row=3, column=2)  # Adjust the padx value as needed
         self.b_entry = tk.Entry(root, width=10)
         self.b_entry.grid(row=4, column=2)
-        # self.b_entry.insert(0, "hehe")  # Insert the placeholder text
 
         self.linear_button = tk.Button(root, text="Linear", command=self.adjust_image_linear)
         self.linear_button.grid(row=1, column=1, pady=5)
@@ -70,7 +69,46 @@ class ImageEditorApp:
         self.gray_level_slicing_button.grid(row=11, column=2, pady=5)
         
         self.recover_button = tk.Button(root, text="Recover Image", command=self.recover_image)
-        self.recover_button.grid(row=12, column=0, columnspan=3, pady=5)
+        self.recover_button.grid(row=15, column=0, columnspan=3, pady=5)
+
+        self.histogram_button = tk.Button(root, text="Display Histogram", command=self.display_histogram)
+        self.histogram_button.grid(row=8, column=0, pady=5)
+
+        self.auto_level_button = tk.Button(root, text="Auto-Level", command=self.auto_level)
+        self.auto_level_button.grid(row=8, column=1, pady=5)
+
+        self.histogram_canvas = tk.Canvas(root, width=256, height=200)
+        self.histogram_canvas.grid(row=9, column=0, columnspan=2, pady=5)
+        
+        self.bit_plane_label = tk.Label(root, text="Bit-Plane:")
+        self.bit_plane_label.grid(row=10, column=0, pady=5)
+
+        self.bit_plane_var = tk.IntVar()
+        self.bit_plane_var.set(7)  # Default to the 7th bit-plane
+        self.bit_plane_dropdown = tk.OptionMenu(root, self.bit_plane_var, *range(8), command=self.display_bit_plane)
+        self.bit_plane_dropdown.grid(row=10, column=1, pady=5)
+
+        self.smoothing_label = tk.Label(root, text="Smoothing Level:")
+        self.smoothing_label.grid(row=11, column=0, pady=5)
+
+        self.smoothing_var = tk.DoubleVar()
+        self.smoothing_var.set(1.0)  # Default smoothing level
+        self.smoothing_slider = tk.Scale(root, from_=0.1, to=2.0, resolution=0.1, orient=tk.HORIZONTAL, variable=self.smoothing_var)
+        self.smoothing_slider.grid(row=11, column=1, pady=5)
+
+        self.sharpening_label = tk.Label(root, text="Sharpening Level:")
+        self.sharpening_label.grid(row=12, column=0, pady=5)
+
+        self.sharpening_var = tk.DoubleVar()
+        self.sharpening_var.set(1.0)  # Default sharpening level
+        self.sharpening_slider = tk.Scale(root, from_=0.1, to=2.0, resolution=0.1, orient=tk.HORIZONTAL, variable=self.sharpening_var)
+        self.sharpening_slider.grid(row=12, column=1, pady=5)
+
+        self.apply_smoothing_button = tk.Button(root, text="Apply Smoothing", command=self.apply_smoothing)
+        self.apply_smoothing_button.grid(row=13, column=0, pady=5)
+
+        self.apply_sharpening_button = tk.Button(root, text="Apply Sharpening", command=self.apply_sharpening)
+        self.apply_sharpening_button.grid(row=13, column=1, pady=5)
 
         self.original_image = None
         self.image = None
@@ -201,7 +239,9 @@ class ImageEditorApp:
                     else:
                         pixels[i, j] = 0
 
-            self.display_image()
+            self.photo = ImageTk.PhotoImage(grayscale_image)
+            self.image_label.config(image=self.photo)
+            self.image_label.image = self.photo
         except ValueError:
             self.message_label.config(text="Invalid input for gray levels")
 
@@ -209,7 +249,76 @@ class ImageEditorApp:
         if self.original_image:
             self.image = self.original_image.copy()
             self.display_image()
+    def display_histogram(self):
+        if self.image:
+            if self.image.mode == 'L':
+                histogram = self.image.histogram()
+                grayscale_histogram = histogram[0:256]
 
+                # Calculate the maximum count for normalization
+                max_count = max(grayscale_histogram)
+
+                # Create a blank image for the histogram
+                hist_image = Image.new('RGB', (256, 200), "white")
+                draw = ImageDraw.Draw(hist_image)
+
+                # Draw histogram bars
+                for i in range(256):
+                    bar_height = int(200 * grayscale_histogram[i] / max_count)
+                    draw.rectangle([i, 200, i + 1, 200 - bar_height], fill="black")
+
+                # Convert PIL image to PhotoImage
+                hist_photo = ImageTk.PhotoImage(hist_image)
+
+                # Display the histogram image on the Canvas
+                self.histogram_canvas.create_image(0, 0, anchor=tk.NW, image=hist_photo)
+                self.histogram_canvas.hist_photo = hist_photo
+
+    def auto_level(self):
+        if self.image:
+            grayscale_image = self.image.convert("L")
+            if grayscale_image.mode == 'RGB':
+                # Convert to grayscale and apply auto-level to each channel
+                r_channel, g_channel, b_channel = self.image.split()
+                r_channel = self.auto_level_single_channel(r_channel)
+                g_channel = self.auto_level_single_channel(g_channel)
+                b_channel = self.auto_level_single_channel(b_channel)
+                self.image = Image.merge('RGB', (r_channel, g_channel, b_channel))
+            else:
+                # Grayscale image auto-level
+                self.image = self.auto_level_single_channel(grayscale_image)
+
+            self.display_image()
+
+    def auto_level_single_channel(self, image):
+        # Histogram equalization
+        image = ImageOps.equalize(image)
+        return image
+    
+    def display_bit_plane(self, *args):
+        self.recover_image()
+        if self.image:
+            if self.image.mode == 'L':
+                bit_plane = self.bit_plane_var.get()
+                image_array = np.array(self.image)
+                bit_plane_image = ((image_array >> bit_plane) & 1) * 255
+                bit_plane_image = Image.fromarray(bit_plane_image)
+                self.image = bit_plane_image
+                self.display_image()
+
+    def apply_smoothing(self):
+        if self.image:
+            smoothing_level = self.smoothing_var.get()
+            smoothed_image = self.image.filter(ImageFilter.GaussianBlur(smoothing_level))
+            self.image = smoothed_image
+            self.display_image()
+
+    def apply_sharpening(self):
+        if self.image:
+            sharpening_level = self.sharpening_var.get()
+            sharpened_image = self.image.filter(ImageFilter.UnsharpMask(radius=2, percent=sharpening_level))
+            self.image = sharpened_image
+            self.display_image()
 if __name__ == "__main__":
     root = tk.Tk()
     app = ImageEditorApp(root)
