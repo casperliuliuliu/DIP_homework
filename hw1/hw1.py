@@ -261,7 +261,7 @@ class ImageEditorApp:
             for i in range(256):
                 # print(grayscale_histogram[i])
                 bar_height = int(2000 * grayscale_histogram[i] / max_count)
-                draw.rectangle([i+20, 200, i + 21, 200 - bar_height], fill="black")
+                draw.rectangle([i+20, 200 - bar_height, i + 21, 200], fill="black")
 
             # Convert PIL image to PhotoImage
             hist_photo = ImageTk.PhotoImage(hist_image)
