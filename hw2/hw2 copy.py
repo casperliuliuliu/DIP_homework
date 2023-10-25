@@ -7,88 +7,85 @@ import numpy as np
 import cv2
 
 # Function to open and process images
-class Func2:
-    def __init__(self, tab2_frame, main_app):
-        self.tab2_frame = tab2_frame
-        self.main_app = main_app
-        self.create_tab2_widgets()  # Create buttons and labels for Tab 1
-
-    def create_tab2_widgets(self):
+class ImageEditorApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Image Editor")
 
         # Image field
-        self.image_label = tk.Label(self.tab2_frame)
+        self.image_label = tk.Label(root)
         self.image_label.grid(row=0, column=0, columnspan=3, pady=10)
         
-        self.image_b_label = tk.Label(self.tab2_frame)
+        self.image_b_label = tk.Label(root)
         self.image_b_label.grid(row=0, column=4, columnspan=3, pady=10)
 
-        self.open_button = tk.Button(self.tab2_frame, text="Open Image", command=self.open_image)
+        self.open_button = tk.Button(root, text="Open Image", command=self.open_image)
         self.open_button.grid(row=1, column=0, pady=5)
 
-        self.save_button = tk.Button(self.tab2_frame, text="Save Image", command=self.save_image)
+        self.save_button = tk.Button(root, text="Save Image", command=self.save_image)
         self.save_button.grid(row=2, column=0, pady=5)
 
-        self.recover_button = tk.Button(self.tab2_frame, text="Recover Image", command=self.recover_image)
+        self.recover_button = tk.Button(root, text="Recover Image", command=self.recover_image)
         self.recover_button.grid(row=3, column=0, pady=5)
 
-        self.message_label = tk.Label(self.tab2_frame, text="", fg="green")
+        self.message_label = tk.Label(root, text="", fg="green")
         self.message_label.grid(row=11, column=0, columnspan=3)
 
-        self.error_label = tk.Label(self.tab2_frame, text="", fg="red")
+        self.error_label = tk.Label(root, text="", fg="red")
         self.error_label.grid(row=12, column=0, columnspan=3)
         
-        self.average_button = tk.Button(self.tab2_frame, text="Avg Filter", command=self.average_filter)
+        self.average_button = tk.Button(root, text="Avg Filter", command=self.average_filter)
         self.average_button.grid(row=1, column=1, pady=5)
 
-        self.median_button = tk.Button(self.tab2_frame, text="Med Filter", command=self.median_filter)
+        self.median_button = tk.Button(root, text="Med Filter", command=self.median_filter)
         self.median_button.grid(row=2, column=1, pady=5)
 
-        self.laplacian_button = tk.Button(self.tab2_frame, text="Lap Filter", command=self.laplacian_filter)
+        self.laplacian_button = tk.Button(root, text="Lap Filter", command=self.laplacian_filter)
         self.laplacian_button.grid(row=3, column=1, pady=5)
 
         self.current_state = tk.StringVar()
         self.current_state.set('A')
 
-        self.txt_label = tk.Label(self.tab2_frame, text="Current State:")
+        self.txt_label = tk.Label(root, text="Current State:")
         self.txt_label.grid(row=1, column=2, pady=5)
 
-        self.state_label = tk.Label(self.tab2_frame, textvariable=self.current_state)
+        self.state_label = tk.Label(root, textvariable=self.current_state)
         self.state_label.grid(row=2, column=2, pady=5)
 
-        self.toggle_button = tk.Button(self.tab2_frame, text="Toggle", command=self.toggle_state)
+        self.toggle_button = tk.Button(root, text="Toggle", command=self.toggle_state)
         self.toggle_button.grid(row=3, column=2, pady=5)
 
-        self.white_bar1 = tk.Button(self.tab2_frame, text="7x7 arith", command=self.arithmetic_mean7)
+        self.white_bar1 = tk.Button(root, text="7x7 arith", command=self.arithmetic_mean7)
         self.white_bar1.grid(row=1, column=3, pady=5)
 
-        self.white_bar2 = tk.Button(self.tab2_frame, text="3x3 arith", command=self.arithmetic_mean3)
+        self.white_bar2 = tk.Button(root, text="3x3 arith", command=self.arithmetic_mean3)
         self.white_bar2.grid(row=2, column=3, pady=5)
 
-        self.white_bar3 = tk.Button(self.tab2_frame, text="7x7 median", command=self.median_filter7)
+        self.white_bar3 = tk.Button(root, text="7x7 median", command=self.median_filter7)
         self.white_bar3.grid(row=3, column=3, pady=5)
 
-        self.white_bar4 = tk.Button(self.tab2_frame, text="3x3 median", command=self.median_filter)
+        self.white_bar4 = tk.Button(root, text="3x3 median", command=self.median_filter)
         self.white_bar4.grid(row=4, column=3, pady=5)
 
-        self.spectrum = tk.Button(self.tab2_frame, text="2D-FFT", command=self.fft_2d)
+        self.spectrum = tk.Button(root, text="2D-FFT", command=self.fft_2d)
         self.spectrum.grid(row=1, column=4, pady=5)
 
-        self.spectrum = tk.Button(self.tab2_frame, text="mag and phase", command=self.magnitude_and_phase)
+        self.spectrum = tk.Button(root, text="mag and phase", command=self.magnitude_and_phase)
         self.spectrum.grid(row=2, column=4, pady=5)
 
-        self.dft1 = tk.Button(self.tab2_frame, text="1 mul", command=self.multiply_image)
+        self.dft1 = tk.Button(root, text="1 mul", command=self.multiply_image)
         self.dft1.grid(row=1, column=5, pady=5)
 
-        self.dft2 = tk.Button(self.tab2_frame, text="2 dft", command=self.compute_dft)
+        self.dft2 = tk.Button(root, text="2 dft", command=self.compute_dft)
         self.dft2.grid(row=2, column=5, pady=5)
 
-        self.dft3 = tk.Button(self.tab2_frame, text="3 conj", command=self.transform_conjugate)
+        self.dft3 = tk.Button(root, text="3 conj", command=self.transform_conjugate)
         self.dft3.grid(row=3, column=5, pady=5)
 
-        self.dft4 = tk.Button(self.tab2_frame, text="4 inverse", command=self.inverse_dft)
+        self.dft4 = tk.Button(root, text="4 inverse", command=self.inverse_dft)
         self.dft4.grid(row=4, column=5, pady=5)
 
-        self.dft5 = tk.Button(self.tab2_frame, text="5 real", command=self.multiply_real)
+        self.dft5 = tk.Button(root, text="5 real", command=self.multiply_real)
         self.dft5.grid(row=5, column=5, pady=5)
 
         self.image_a = None
@@ -342,3 +339,7 @@ class Func2:
         else:
             self.image_b = self.original_image_b.copy()
         self.display_image()
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ImageEditorApp(root)
+    root.mainloop()

@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from hw1 import Func1
+from hw2 import Func2
 
 class ImageEditorApp:
     def __init__(self, root):
@@ -16,11 +17,12 @@ class ImageEditorApp:
 
         # Create a frame for the second tab
         self.tab2_frame = ttk.Frame(self.notebook)
+        self.tab2_functions = Func2(self.tab2_frame, self)
         # self.create_tab2_widgets()  # Create buttons and labels for Tab 2
 
         # Add the frames as tabs to the notebook
-        self.notebook.add(self.tab1_frame, text="Tab 1")
-        self.notebook.add(self.tab2_frame, text="Tab 2")
+        self.notebook.add(self.tab1_frame, text="Homework 1")
+        self.notebook.add(self.tab2_frame, text="Homework 2")
         # self.create_tab1_widgets()  # Create buttons and labels for Tab 1
             
 if __name__ == "__main__":
