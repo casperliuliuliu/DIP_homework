@@ -158,13 +158,13 @@ class ImageEditorApp:
             image_array = np.array(self.image_b, dtype=np.float32)
         image_array = self.temp_array
         dft = np.fft.fft2(image_array)
-        self.temp_array = np.abs(dft)
+        self.temp_array = dft
 
         if self.current_state.get() == 'A':
-            self.image_a = Image.fromarray(np.abs(dft).astype(np.uint8))
+            self.image_a = Image.fromarray(dft.astype(np.uint8))
         else:
-            self.image_b = Image.fromarray(np.abs(dft).astype(np.uint8))
-        self.print_array()
+            self.image_b = Image.fromarray(dft.astype(np.uint8))
+        # self.print_array()
         self.display_image()
 
     def multiply_image(self):
