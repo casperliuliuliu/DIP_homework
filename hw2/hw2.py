@@ -73,23 +73,123 @@ class ImageEditorApp:
         self.spectrum = tk.Button(root, text="mag and phase", command=self.magnitude_and_phase)
         self.spectrum.grid(row=2, column=4, pady=5)
 
-        self.dft1 = tk.Button(root, text="1 mul", command=self.arithmetic_mean7)
+        self.dft1 = tk.Button(root, text="1 mul", command=self.multiply_image)
         self.dft1.grid(row=1, column=5, pady=5)
 
-        self.dft2 = tk.Button(root, text="2 dft", command=self.arithmetic_mean3)
+        self.dft2 = tk.Button(root, text="2 dft", command=self.compute_dft)
         self.dft2.grid(row=2, column=5, pady=5)
 
-        self.dft3 = tk.Button(root, text="3 conj", command=self.median_filter7)
+        self.dft3 = tk.Button(root, text="3 conj", command=self.transform_conjugate)
         self.dft3.grid(row=3, column=5, pady=5)
 
-        self.dft4 = tk.Button(root, text="4 inverse", command=self.median_filter)
+        self.dft4 = tk.Button(root, text="4 inverse", command=self.inverse_dft)
         self.dft4.grid(row=4, column=5, pady=5)
 
-        self.dft5 = tk.Button(root, text="5 real", command=self.median_filter)
+        self.dft5 = tk.Button(root, text="5 real", command=self.multiply_real)
         self.dft5.grid(row=5, column=5, pady=5)
 
         self.image_a = None
         self.image_b = None
+        self.temp_array = None
+    def multiply_real(self):
+        if self.current_state.get() == 'A':
+            image_array = np.array(self.image_a, dtype=np.float32)
+        else:
+            image_array = np.array(self.image_b, dtype=np.float32)
+        image_array = self.temp_array
+        height, width = np.shape(image_array)
+
+        # Create a grid of x and y coordinates
+        x, y = np.meshgrid(np.arange(width), np.arange(height))
+        
+        # Multiply the real part of the IDFT by (-1)x+y
+        result_image_array = self.temp_array .real * (-1) * x + y
+        
+        # Normalize the result if needed
+        min_val = np.min(result_image_array)
+        max_val = np.max(result_image_array)
+        result_image_array = (result_image_array - min_val) / (max_val - min_val) * 255
+        
+        # Convert the NumPy array back to an image
+        self.temp_array = None
+        
+        if self.current_state.get() == 'A':
+            self.image_a = Image.fromarray(result_image_array.astype(np.uint8))
+        else:
+            self.image_b = Image.fromarray(result_image_array.astype(np.uint8))
+        self.display_image()
+
+    def inverse_dft(self):
+        if self.current_state.get() == 'A':
+            image_array = np.array(self.image_a, dtype=np.float32)
+        else:
+            image_array = np.array(self.image_b, dtype=np.float32)
+        image_array = self.temp_array
+
+        idft_result = np.fft.ifft2(image_array)
+        self.temp_array = idft_result
+        if self.current_state.get() == 'A':
+            self.image_a = Image.fromarray(idft_result.astype(np.uint8))
+        else:
+            self.image_b = Image.fromarray(idft_result.astype(np.uint8))
+        self.display_image()
+
+
+    def transform_conjugate(self):
+        if self.current_state.get() == 'A':
+            image_array = np.array(self.image_a, dtype=np.float32)
+        else:
+            image_array = np.array(self.image_b, dtype=np.float32)
+        image_array = self.temp_array
+        dft_conjugate = np.fft.ifft2(image_array.conj())
+        self.temp_array = dft_conjugate
+        # dft_conjugate = np.conjugate(image_array)
+
+        if self.current_state.get() == 'A':
+            self.image_a = Image.fromarray(dft_conjugate.astype(np.uint8))
+        else:
+            self.image_b = Image.fromarray(dft_conjugate.astype(np.uint8))
+        self.display_image()
+
+    def compute_dft(self):
+        if self.current_state.get() == 'A':
+            image_array = np.array(self.image_a, dtype=np.float32)
+        else:
+            image_array = np.array(self.image_b, dtype=np.float32)
+        image_array = self.temp_array
+        dft = np.fft.fft2(image_array)
+        self.temp_array = np.abs(dft)
+
+        if self.current_state.get() == 'A':
+            self.image_a = Image.fromarray(np.abs(dft).astype(np.uint8))
+        else:
+            self.image_b = Image.fromarray(np.abs(dft).astype(np.uint8))
+        self.print_array()
+        self.display_image()
+
+    def multiply_image(self):
+        if self.current_state.get() == 'A':
+            image_array = np.array(self.image_a, dtype=np.float32)
+        else:
+            image_array = np.array(self.image_b, dtype=np.float32)
+        height, width = np.shape(image_array)
+        # Create a grid of x and y coordinates
+        x, y = np.meshgrid(np.arange(width), np.arange(height))
+
+        # Calculate the result by multiplying the image by (-1)^(x+y)
+        result_image_array = np.multiply(image_array, (-1) ** (x + y))
+        self.temp_array = result_image_array
+        # min_val = np.min(result_image_array)
+        # max_val = np.max(result_image_array)
+        # result_image_array = (result_image_array - min_val) / (max_val - min_val) * 255
+
+        # Convert the NumPy array back to a PIL image
+        if self.current_state.get() == 'A':
+            self.image_a = Image.fromarray(result_image_array.astype(np.uint8))
+        else:
+            self.image_b = Image.fromarray(result_image_array.astype(np.uint8))
+        self.display_image()
+
     def fft_2d(self):
         if self.current_state.get() == 'A':
             image_array = np.array(self.image_a, dtype=np.float32)
@@ -125,16 +225,13 @@ class ImageEditorApp:
         # Create magnitude-only and phase-only images
         magnitude_image = np.fft.ifft2(magnitude)
         # phase_image = np.fft.ifft2(np.exp(1j * phase))
-        
         # Display the magnitude-only image
         magnitude_image = np.abs(magnitude_image).astype(np.uint8)
-
         self.image_a = Image.fromarray(magnitude_image.astype(np.uint8))
         self.display_image()
         self.toggle_state()
 
         self.image_b = Image.fromarray(phase.astype(np.uint8))
-        # self.print_array()
         self.display_image()
 
     def toggle_state(self):
@@ -171,18 +268,16 @@ class ImageEditorApp:
     def laplacian_filter(self):
         kernel = [0, -1, 0, -1, 4, -1, 0, -1, 0]
         if self.current_state.get() == 'A':
-            self.image_a = self.image_a.filter(ImageFilter.Kernel((3, 3), kernel, offset=100))
+            image_array = np.array(self.image_a, dtype=np.float32)
+            laplacian_image = cv2.Laplacian(image_array, -1, ksize=3)
+            # self.image_a = self.image_a.filter(ImageFilter.Kernel((3, 3), kernel, offset=100))
+            self.image_a = Image.fromarray(laplacian_image.astype(np.uint8))
         else:
-            self.image_b = self.image_b.filter(ImageFilter.Kernel((3, 3), kernel, offset=100))
-        # filtered_array = np.array(filtered_image)
-
-        # # Normalize the filtered image
-        # min_val = np.min(filtered_array)
-        # max_val = np.max(filtered_array)
-        # normalized_image = (filtered_array - min_val) * 255.0 / (max_val - min_val)
-        # print(normalized_image)
-        # # Convert the NumPy array back to a PIL image
-        # self.image = Image.fromarray(normalized_image.astype(np.uint8))
+            image_array = np.array(self.image_b, dtype=np.float32)
+            laplacian_image = cv2.Laplacian(image_array, -1, ksize=3)
+            self.image_b = Image.fromarray(laplacian_image.astype(np.uint8))
+            # self.image_b = self.image_b.filter(ImageFilter.Kernel((3, 3), kernel, offset=100))
+        
         self.display_image()
 
     def arithmetic_mean7(self):
