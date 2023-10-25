@@ -1,11 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter import filedialog
-from tkinter import messagebox
-from PIL import Image, ImageTk, ImageOps, ImageDraw, ImageFilter
-from math import exp, log
-import numpy as np
-from test import Func1
+from hw1 import Func1
+
 class ImageEditorApp:
     def __init__(self, root):
         self.root = root

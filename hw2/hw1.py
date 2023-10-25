@@ -318,7 +318,3 @@ class Func1:
         except Exception as e:
             self.error_label.config(text=f"Error: {str(e)}")
             
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = ImageEditorApp(root)
-    root.mainloop()
