@@ -5,26 +5,11 @@ from tkinter import messagebox
 from PIL import Image, ImageTk, ImageOps, ImageDraw, ImageFilter
 from math import exp, log
 import numpy as np
-
-class ImageEditorApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Image Editor")
-        # Create a ttk.Notebook to hold the tabs
-        self.notebook = ttk.Notebook(root)
-        self.notebook.grid(row=0, column=0, columnspan=6)
-
-        # Create a frame for the first tab
-        self.tab1_frame = ttk.Frame(self.notebook)
+class Func1:
+    def __init__(self, tab1_frame, main_app):
+        self.tab1_frame = tab1_frame
+        self.main_app = main_app
         self.create_tab1_widgets()  # Create buttons and labels for Tab 1
-
-        # Create a frame for the second tab
-        self.tab2_frame = ttk.Frame(self.notebook)
-        # self.create_tab2_widgets()  # Create buttons and labels for Tab 2
-
-        # Add the frames as tabs to the notebook
-        self.notebook.add(self.tab1_frame, text="Tab 1")
-        self.notebook.add(self.tab2_frame, text="Tab 2")
 
     def create_tab1_widgets(self):
         # Image field
@@ -34,8 +19,6 @@ class ImageEditorApp:
         self.recover_button = tk.Button(self.tab1_frame, text="Recover Image", command=self.recover_image)
         self.message_label = tk.Label(self.tab1_frame, text="", fg="green")
         self.error_label = tk.Label(self.tab1_frame, text="", fg="red")
-
-
 
         # Ask for the value a
         self.a_label = tk.Label(self.tab1_frame, text="a (for contrast and resize)")

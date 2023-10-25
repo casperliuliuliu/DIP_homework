@@ -3,7 +3,7 @@ from tkinter import messagebox
 from PIL import Image, ImageTk, ImageOps, ImageDraw, ImageFilter
 from math import exp, log
 import numpy as np
-
+class ImageEditorFunctions:
 def open_image(self):
     file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.tif *.tiff")])
     try:
