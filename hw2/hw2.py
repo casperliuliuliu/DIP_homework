@@ -104,9 +104,10 @@ class Func2:
 
         # Create a grid of x and y coordinates
         x, y = np.meshgrid(np.arange(width), np.arange(height))
-        
+        # Calculate the result by multiplying the image by (-1)^(x+y)
+        result_image_array = np.multiply(image_array, (-1) ** (x + y))
         # Multiply the real part of the IDFT by (-1)x+y
-        result_image_array = self.temp_array .real * (-1) * x + y
+        # result_image_array = self.temp_array .real * (-1) * x + y
         
         # Normalize the result if needed
         min_val = np.min(result_image_array)
@@ -143,15 +144,24 @@ class Func2:
             image_array = np.array(self.image_a, dtype=np.float32)
         else:
             image_array = np.array(self.image_b, dtype=np.float32)
+
         image_array = self.temp_array
-        dft_conjugate = np.fft.ifft2(image_array.conj())
+        # dft_conjugate = np.fft.ifft2(image_array.conj())
+        dft_conjugate = np.conjugate(image_array)
+
+        fft_image = np.fft.fftshift(dft_conjugate)
+        # Compute the magnitude of the spectrum
+        magnitude_spectrum = np.log(np.abs(fft_image) + 1)
+        min_mag = np.min(magnitude_spectrum)
+        max_mag = np.max(magnitude_spectrum)
+        magnitude_spectrum = (magnitude_spectrum - min_mag) / (max_mag - min_mag) * 255
+        
         self.temp_array = dft_conjugate
-        # dft_conjugate = np.conjugate(image_array)
 
         if self.current_state.get() == 'A':
-            self.image_a = Image.fromarray(dft_conjugate.astype(np.uint8))
+            self.image_a = Image.fromarray(magnitude_spectrum.astype(np.uint8))
         else:
-            self.image_b = Image.fromarray(dft_conjugate.astype(np.uint8))
+            self.image_b = Image.fromarray(magnitude_spectrum.astype(np.uint8))
         self.display_image()
 
     def compute_dft(self):
@@ -161,12 +171,20 @@ class Func2:
             image_array = np.array(self.image_b, dtype=np.float32)
         image_array = self.temp_array
         dft = np.fft.fft2(image_array)
-        self.temp_array = dft
         
+        fft_image = np.fft.fftshift(dft)
+        # Compute the magnitude of the spectrum
+        magnitude_spectrum = np.log(np.abs(fft_image) + 1)
+        min_mag = np.min(magnitude_spectrum)
+        max_mag = np.max(magnitude_spectrum)
+        magnitude_spectrum = (magnitude_spectrum - min_mag) / (max_mag - min_mag) * 255
+
+        self.temp_array = dft
+
         if self.current_state.get() == 'A':
-            self.image_a = Image.fromarray(dft.astype(np.uint8))
+            self.image_a = Image.fromarray(magnitude_spectrum.astype(np.uint8))
         else:
-            self.image_b = Image.fromarray(dft.astype(np.uint8))
+            self.image_b = Image.fromarray(magnitude_spectrum.astype(np.uint8))
         # self.print_array()
         self.display_image()
 
