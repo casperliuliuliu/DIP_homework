@@ -159,7 +159,7 @@ class ImageEditorApp:
         image_array = self.temp_array
         dft = np.fft.fft2(image_array)
         self.temp_array = dft
-
+        
         if self.current_state.get() == 'A':
             self.image_a = Image.fromarray(dft.astype(np.uint8))
         else:
@@ -266,7 +266,7 @@ class ImageEditorApp:
         print(image_array)
 
     def laplacian_filter(self):
-        kernel = [0, -1, 0, -1, 4, -1, 0, -1, 0]
+        kernel = [0, 1, 0, 1, -4, 1, 0, 1, 0]
         if self.current_state.get() == 'A':
             image_array = np.array(self.image_a, dtype=np.float32)
             laplacian_image = cv2.Laplacian(image_array, -1, ksize=3)
