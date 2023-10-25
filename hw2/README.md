@@ -102,9 +102,9 @@ The Image Processing Application offers several features for opening, processing
 #### Magnitude and Phase
 - Click the "mag and phase" button to compute and display the magnitude and phase of the FFT.
 
-#### Image Multiplication
+#### Image DFT and IDFT
 - The application provides multiple options for image multiplication.
-- Use the buttons labeled "1 mul," "2 dft," "3 conj," "4 inverse," and "5 real" for different image multiplication operations.
+- Use the buttons labeled "1 mul," "2 dft," "3 conj," "4 inverse," and "5 real" for different image DFTs.
 
 ## 5. Troubleshooting
 
@@ -115,6 +115,6 @@ If you encounter any issues while using the Image Processing Application, consid
 
 ## 6. Support and Contact
 
-If you need further assistance or have questions about the Image Processing Application, you can contact the application developer at [developer@email.com](mailto:developer@email.com).
+If you need further assistance or have questions about the Image Processing Application, you can contact the application developer at [https://github.com/casperliuliuliu].
 
 Enjoy using the Image Processing Application for your image manipulation needs!
