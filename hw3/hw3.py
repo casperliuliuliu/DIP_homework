@@ -25,16 +25,65 @@ class ImageEditorApp:
         self.message_label.grid(row=11, column=0, columnspan=3)
         self.error_label.grid(row=12, column=0, columnspan=3)
 
-        self.red_button = tk.Button(root, text="Red Part", command=self.red_part)
+        self.red_button = tk.Button(root, text="Show Red", command=self.red_part)
+        self.red_button.grid(row=1, column=1, pady=5)
 
+        self.green_button = tk.Button(root, text="Show Green", command=self.green_part)
+        self.green_button.grid(row=2, column=1, pady=5)
+
+        self.blue_button = tk.Button(root, text="Show Blue", command=self.blue_part)
+        self.blue_button.grid(row=3, column=1, pady=5)
+
+        self.hue_button = tk.Button(root, text="Show Hue", command=self.hue_part)
+        self.hue_button.grid(row=1, column=2, pady=5)
+
+        self.sat_button = tk.Button(root, text="Show Saturation", command=self.sat_part)
+        self.sat_button.grid(row=2, column=2, pady=5)
+
+        self.gray_button = tk.Button(root, text="Show Intensity", command=self.gray_part)
+        self.gray_button.grid(row=3, column=2, pady=5)
         # Initializing
         self.original_image = None
         self.image = None
-    def rgb_part(self, color):
+
+    def rgb2hsv(self):
+        self.image = self.image.convert("HSV")
+        self.image = self
+        self.display_image()
+
+    def hue_part(self):
+        self.rgb2hsv()
         pass
-    
+    def sat_part(self):
+        self.rgb2hsv()
+        pass
+    def gray_part(self):
+        self.rgb2hsv()
+        pass
+
+    def rgb_part(self, color_id):
+        # Splitting r,g,b image
+        red, green, blue = self.image.split()
+        # get a All 0s image
+        temp, _, _ = Image.new("RGB", (512,512)).split()
+
+        if color_id == 0:
+            new_image = (red, temp, temp)
+        elif color_id == 1:
+            new_image = (temp, green, temp)
+        elif color_id == 2:
+            new_image = (temp, temp, blue)
+
+        self.image = Image.merge("RGB", new_image)
+        self.display_image()
+
+
     def red_part(self):
-        self.rgb_part('r')
+        self.rgb_part(0)
+    def green_part(self):
+        self.rgb_part(1)
+    def blue_part(self):
+        self.rgb_part(2)
 
     def open_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.tif *.tiff")])
