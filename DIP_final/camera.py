@@ -9,7 +9,7 @@ class VideoApp:
     option = 'ori'
     recording = False
     filename = None
-    recording_path = "/Users/liushiwen/Desktop/大四上/數位影像處理/DIP_homework/DIP_final/"
+    # recording_path = "/Users/liushiwen/Desktop/大四上/數位影像處理/DIP_homework/DIP_final/"
     def __init__(self, root, video_source=0, width=640, height=480):
         self.root = root
         self.root.title("Video Processing App")
@@ -51,7 +51,7 @@ class VideoApp:
         self.stop_btn = ttk.Button(self.btn_frame, text="Stop", command=self.stop_recording)
         self.stop_btn.grid(row=1, column=1, padx=10)
 
-        
+
 
         self.video_update()
 
@@ -110,15 +110,17 @@ class VideoApp:
         self.root.destroy()
 
     def start_recording(self):
-        self.recording = True
-        self.filename = f"{self.recording_path}recording_{datetime.now()}.mp4"
-        self.writer = cv2.VideoWriter(self.filename, cv2.VideoWriter_fourcc(*"mp4v"), 20, (640, 480))
+        # self.recording = True
+        # self.filename = f"{self.recording_path}recording_{datetime.now()}.mp4"
+        # self.writer = cv2.VideoWriter(self.filename, cv2.VideoWriter_fourcc(*"mp4v"), 20, (640, 480))
+        pass
 
     def stop_recording(self):
-        self.recording = False
-        self.stop_btn["state"] = tk.DISABLED
-        self.record_btn["state"] = tk.NORMAL
-        self.writer.release()
+        # self.recording = False
+        # self.stop_btn["state"] = tk.DISABLED
+        # self.record_btn["state"] = tk.NORMAL
+        # self.writer.release()
+        pass
 
 if __name__ == "__main__":
     root = tk.Tk()
