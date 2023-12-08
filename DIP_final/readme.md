@@ -4,6 +4,8 @@
 ### DONE:
 * RGB 
 ### WORKING:
+
+(BASIC)
 * Zoom in, zoom out
 * gray level slicing
 * sharpen
@@ -27,6 +29,8 @@
 * separate pages
 * rotate
 * histogram
+
+(ADVANCED)
 * texture filter
 * HaHa mirror(big middle)
 * HaHa mirror(big upper)
