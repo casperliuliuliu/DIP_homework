@@ -34,4 +34,5 @@
 * HaHa mirror(small upper)
 * HaHa mirror(small middle)
 * HaHa mirror(small down)
-
+* Water wave from bottom to head
+* Movement detection
