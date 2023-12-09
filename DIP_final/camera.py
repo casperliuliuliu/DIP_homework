@@ -1,9 +1,11 @@
-
 import cv2
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
 from datetime import datetime
+import tkmacosx
+from funcs import change_color
+
 
 class VideoApp:
     option = 'ori'
@@ -33,13 +35,16 @@ class VideoApp:
         self.ori_btn = ttk.Button(self.btn_frame, text="Recover", command=self.recover)
         self.ori_btn.grid(row=0, column=0, padx=10)
 
-        self.red_btn = ttk.Button(self.btn_frame, text="Red", command=self.apply_red_channel)
+        self.red_var = tk.IntVar(value=0)
+        self.red_btn = tkmacosx.Button(self.btn_frame, text="Red", command=lambda: change_color(self.red_btn, self.red_var), bg="white")
         self.red_btn.grid(row=0, column=1, padx=10)
 
-        self.blue_btn = ttk.Button(self.btn_frame, text="Blue", command=self.apply_blue_channel)
+        self.blue_var = tk.IntVar(value=0)
+        self.blue_btn = tkmacosx.Button(self.btn_frame, text="Blue", command=lambda: change_color(self.blue_btn, self.blue_var), bg="white")
         self.blue_btn.grid(row=0, column=2, padx=10)
 
-        self.green_btn = ttk.Button(self.btn_frame, text="Green", command=self.apply_green_channel)
+        self.green_var = tk.IntVar(value=0)
+        self.green_btn = tkmacosx.Button(self.btn_frame, text="Green", command=lambda: change_color(self.green_btn, self.green_var), bg="white")
         self.green_btn.grid(row=0, column=3, padx=10)
 
         self.exit_btn = ttk.Button(self.btn_frame, text="Exit", command=self.exit_app)
@@ -81,33 +86,34 @@ class VideoApp:
         
     def cool_filter(self, img):
         temp_img = img.copy()
-        if self.option == "red":
+    
+        if self.red_var.get():
             temp_img[:, :, 2] = 0  # Set blue channel to 0
             temp_img[:, :, 1] = 0  # Set green channel to 0
-        elif self.option == "blue":
+        if self.blue_var.get():
             temp_img[:, :, 0] = 0  # Set red channel to 0
             temp_img[:, :, 1] = 0  # Set green channel to 0
-        elif self.option == "green":
+        if self.green_var.get():
             temp_img[:, :, 0] = 0  # Set red channel to 0
             temp_img[:, :, 2] = 0  # Set blue channel to 0
+        
             
         img_right = Image.fromarray(temp_img)
         return img_right
 
     def recover(self):
-        self.option = "ori"
-    def apply_red_channel(self):
-        self.option = "red"
+        self.red_var.set(0)
+        self.red_btn['bg'] = "white"
+        self.blue_var.set(0)
+        self.blue_btn['bg'] = "white"
+        self.green_var.set(0)
+        self.green_btn['bg'] = "white"
 
-    def apply_blue_channel(self):
-        self.option = "blue"
-
-    def apply_green_channel(self):
-        self.option = "green"
 
     def exit_app(self):
         self.cap.release()
         self.root.destroy()
+
 
     def start_recording(self):
         # self.recording = True
