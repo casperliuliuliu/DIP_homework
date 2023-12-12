@@ -2,11 +2,18 @@
 
 ## Functions
 ### DONE:
+(BASIC)
 * RGB 
 * Zoom in, zoom out
+
+(ADVANCED)
+* Reflection
+* Movement detection
+
 ### WORKING:
 
 (BASIC)
+* random filter
 * gray level slicing
 * sharpen
 * smoothing
@@ -39,5 +46,4 @@
 * HaHa mirror(small middle)
 * HaHa mirror(small down)
 * Water wave from bottom to head
-* Movement detection
-* Reflection
+

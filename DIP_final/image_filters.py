@@ -1,6 +1,7 @@
 import cv2
 from PIL import Image, ImageTk
 import numpy as np
+last_img = 0
 def start(cap):
     while(True):
         # 擷取影像
@@ -24,10 +25,13 @@ def transform(img):
     """
     Test the function to do the filter.
     """
+    global last_img
     # img = zoom_in(img, 1, 2)
     # img = zoom_out(img, 2, 4)
-
-
+    # img = flip_right_to_left(img)
+    # img = flip_top_to_down(img)
+    # img = show_image_difference(img)
+    
     return img
 
 def zoom_in(img, a, b):
@@ -51,7 +55,33 @@ def zoom_out(img, a, b):
     processed_img = cv2.resize(img, (new_width, new_height))
 
     return processed_img
-def 
+
+def flip_right_to_left(img):
+    flipped_img = cv2.flip(img, 1)  # 1 denotes horizontal flip
+
+    return flipped_img
+
+def flip_top_to_down(img):
+    flipped_img = cv2.flip(img, 0)  # 1 denotes horizontal flip
+
+    return flipped_img
+
+def show_image_difference(current_img):
+    global last_img
+    # Ensure the images have the same size
+    if isinstance(last_img, int):
+        last_img = current_img
+
+        return current_img
+    
+    if current_img.shape != last_img.shape:
+        raise ValueError("Image sizes must match.")
+
+    # Compute the absolute difference between the images
+    diff_img = cv2.absdiff(current_img, last_img)
+    last_img = current_img
+
+    return diff_img
 if __name__ == "__main__":
     print('hello')
     cap = cv2.VideoCapture(0)
