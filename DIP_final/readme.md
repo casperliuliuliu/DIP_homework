@@ -31,7 +31,7 @@
 * AVG filter
 * Median filter
 * 2D FFT
-* Bitplane
+* Bitplane on different
 * color Complement
 * separate pages
 * rotate
