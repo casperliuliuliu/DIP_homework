@@ -57,7 +57,6 @@ class VideoApp:
         self.stop_btn.grid(row=1, column=1, padx=10)
 
 
-
         self.video_update()
 
     def video_update(self):

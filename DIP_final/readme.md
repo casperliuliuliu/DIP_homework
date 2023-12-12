@@ -3,10 +3,10 @@
 ## Functions
 ### DONE:
 * RGB 
+* Zoom in, zoom out
 ### WORKING:
 
 (BASIC)
-* Zoom in, zoom out
 * gray level slicing
 * sharpen
 * smoothing
