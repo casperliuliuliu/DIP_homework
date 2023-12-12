@@ -32,11 +32,15 @@ def transform(img):
     # img = flip_right_to_left(img)
     # img = flip_top_to_down(img)
     # img = show_image_difference(img)
-    # img = enlarge_effect(img)
-    img = enlarge_line_effect_fixed(img)
-    # img = enlarge_effect_optimized(img)
+    # img = enlarge_effect_fixed(img)
     # img = reduce_effect_optimized(img)
-    # img = apply_wave_effect(img)
+    # img = apply_mosaic_effect(img)
+    # img = low_quality_effect(img, 10)
+    # img = enlarge_line_effect(img) # still got problems.
+    # img = grayscale_conversion(img)
+    img = sepia_tone(img) # This is boring.
+    # img = invert_colors(img)
+
     return img
 
 def zoom_in(img, a, b):
@@ -83,36 +87,7 @@ def show_image_difference(current_img):
     last_img = current_img
     return diff_img
 
-def enlarge_effect(img, radius = 100):
-    h, w, n = img.shape
-    cx = w / 2
-    cy = h / 2
-    r = int(radius / 2.0)
-    new_img = img.copy()
-    for i in range(w):
-        for j in range(h):
-            tx = i - cx
-            ty = j - cy
-            distance = tx * tx + ty * ty
-            if distance < radius * radius:
-                x = int(int(tx / 2.0) * (math.sqrt(distance) / r) + cx)
-                y = int(int(ty / 2.0) * (math.sqrt(distance) / r) + cy)
-                if x < w and y < h:
-                    new_img[j, i, 0] = img[y, x, 0]
-                    new_img[j, i, 1] = img[y, x, 1]
-                    new_img[j, i, 2] = img[y, x, 2]
-    return new_img
-
 def enlarge_line_effect(img):
-    """
-    Apply a line enlargement effect to the input image (optimized version).
-
-    Parameters:
-    - img: OpenCV image (BGR format)
-
-    Returns:
-    - enlarged_img: Image with the applied line enlargement effect (BGR format)
-    """
     h, w, _ = img.shape
 
     cx = w / 2
@@ -124,10 +99,10 @@ def enlarge_line_effect(img):
     x, y = np.meshgrid(np.arange(w), np.arange(h))
 
     # Calculate distance from the center
-    distance = (x - cx)**2 + (y - cy)**2
+    distance = np.abs(y - cy)
 
-    # Create a mask for pixels within the specified radius
-    mask = distance < radius**2
+    # Create a mask for pixels within the specified distance
+    mask = distance < radius
 
     # Calculate new coordinates
     new_x = (x[mask] - cx) / 2.0 * (np.sqrt(distance[mask]) / r) + cx
@@ -144,21 +119,11 @@ def enlarge_line_effect(img):
     enlarged_img[y[mask], x[mask]] = img[new_y, new_x]
     return enlarged_img
 
-def enlarge_line_effect_fixed(img):
-    """
-    Apply a line enlargement effect to the input image (fixed version).
-
-    Parameters:
-    - img: OpenCV image (BGR format)
-
-    Returns:
-    - enlarged_img: Image with the applied line enlargement effect (BGR format)
-    """
+def enlarge_effect_fixed(img, radius = 100):
     h, w, _ = img.shape
 
     cx = w / 2
     cy = h / 2
-    radius = 200
     r = int(radius / 2.0)
 
     # Create a grid of coordinates
@@ -189,46 +154,92 @@ def enlarge_line_effect_fixed(img):
     enlarged_img[y[outside_radius_mask], x[outside_radius_mask]] = img[y[outside_radius_mask], x[outside_radius_mask]]
     return enlarged_img
 
-def enlarge_effect_optimized(img):
-    h, w, n = img.shape
-    cx = w / 2
-    cy = h / 2
-    radius = 100
-    r = int(radius / 2.0)
+def oilPainting(img, templateSize=4, bucketSize=8, step=2):#templateSize模板大小,bucketSize桶阵列,step模板滑动步长
+ 
+    gray = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+    gray = ((gray/256)*bucketSize).astype(int)                          #灰度图在桶中的所属分区
+    h,w = img.shape[:2]
+     
+    oilImg = np.zeros(img.shape, np.uint8)                              #用来存放过滤图像
+     
+    for i in range(0,h,step):
+        
+        top = i-templateSize
+        bottom = i+templateSize+1
+        if top < 0:
+            top = 0
+        if bottom >= h:
+            bottom = h-1
+            
+        for j in range(0,w,step):
+            
+            left = j-templateSize
+            right = j+templateSize+1
+            if left < 0:
+                left = 0
+            if right >= w:
+                right = w-1
+                
+            # 灰度等级统计
+            buckets = np.zeros(bucketSize,np.uint8)                     #桶阵列，统计在各个桶中的灰度个数
+            bucketsMean = [0,0,0]                                       #对像素最多的桶，求其桶中所有像素的三通道颜色均值
+            #对模板进行遍历
+            for c in range(top,bottom):
+                for r in range(left,right):
+                    buckets[gray[c,r]] += 1                         #模板内的像素依次投入到相应的桶中，有点像灰度直方图
     
-    # Create a grid of coordinates
-    x, y = np.meshgrid(np.arange(w), np.arange(h))
-    
-    # Calculate differences from the center
-    tx = x - cx
-    ty = y - cy
-    
-    # Calculate distance squared
-    distance_squared = tx**2 + ty**2
-    
-    # Create a mask for pixels within the specified radius
-    mask = distance_squared < radius**2
-    
-    # Calculate new coordinates
-    new_x = (tx[mask] / 2.0 * (np.sqrt(distance_squared[mask]) / r) + cx).astype(int)
-    new_y = (ty[mask] / 2.0 * (np.sqrt(distance_squared[mask]) / r) + cy).astype(int)
-    
-    # Clip coordinates to stay within image bounds
-    new_x = np.clip(new_x, 0, w - 1)
-    new_y = np.clip(new_y, 0, h - 1)
-    
-    # Create an output image with the same shape as the input
-    new_img = np.zeros_like(img)
-    
-    # Assign values from the original image to the new coordinates
-    new_img[y[mask], x[mask]] = img[new_y, new_x]
-    return new_img
+            maxBucket = np.max(buckets)                                 #找出像素最多的桶以及它的索引
+            maxBucketIndex = np.argmax(buckets)
+            
+            for c in range(top,bottom):
+                for r in range(left,right):
+                    if gray[c,r] == maxBucketIndex:
+                        bucketsMean += img[c,r]
+            bucketsMean = (bucketsMean/maxBucket).astype(int)           #三通道颜色均值
+            
+            # 油画图
+            for m in range(step):
+                for n in range(step):
+                    oilImg[m+i,n+j] = (bucketsMean[0],bucketsMean[1],bucketsMean[2])
+    return oilImg
 
-def reduce_effect_optimized(img):
+def low_quality_effect(img, resolution = 10):
+    block_size = resolution
+    h, w, _ = img.shape
+    mosaic = cv2.resize(img, (int(w/block_size),int(h/block_size)), interpolation=cv2.INTER_LINEAR)   # 根據縮小尺寸縮小
+    mosaic = cv2.resize(mosaic, (w,h), interpolation=cv2.INTER_NEAREST) 
+    return mosaic
+    
+def apply_mosaic_effect(img, block_size=10):
+    h, w, _ = img.shape
+
+    # Calculate the number of mosaic blocks in each dimension
+    num_blocks_h = h // block_size
+    num_blocks_w = w // block_size
+
+    # Create an output image with the same shape as the input
+    mosaic_img = np.zeros_like(img)
+
+    for i in range(num_blocks_h):
+        for j in range(num_blocks_w):
+            # Calculate the region for each mosaic block
+            start_h = i * block_size
+            end_h = (i + 1) * block_size
+            start_w = j * block_size
+            end_w = (j + 1) * block_size
+
+            # Calculate the average color of the region
+            avg_color = np.mean(img[start_h:end_h, start_w:end_w], axis=(0, 1))
+
+            # Fill the mosaic block with the average color
+            mosaic_img[start_h:end_h, start_w:end_w] = avg_color
+
+    return mosaic_img
+
+def reduce_effect_optimized(img, radius=100):
     h, w, n = img.shape
     cx = w / 2
     cy = h / 2
-    radius = 100
     r = int(radius / 2.0)
     compress = 8
 
@@ -251,38 +262,55 @@ def reduce_effect_optimized(img):
     # Index the original image with the new coordinates
     new_img = img[new_y, new_x]
     return new_img
-def apply_wave_effect(img, amplitude=10, frequency=0.1):
+
+def grayscale_conversion(img):
     """
-    Apply a horizontal wave effect to the input image.
+    Convert the input image to grayscale.
 
     Parameters:
     - img: OpenCV image (BGR format)
-    - amplitude: Amplitude of the wave effect
-    - frequency: Frequency of the wave effect
 
     Returns:
-    - waved_img: Image with the applied wave effect (BGR format)
+    - grayscale_img: Grayscale image (single channel)
     """
-    h, w, _ = img.shape
+    grayscale_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    return grayscale_img
 
-    # Create a grid of coordinates
-    x, y = np.meshgrid(np.arange(w), np.arange(h))
+def sepia_tone(img):
+    """
+    Apply a sepia tone filter to the input image.
 
-    # Apply a horizontal wave distortion
-    wave = amplitude * np.sin(2 * np.pi * frequency * x / w)
+    Parameters:
+    - img: OpenCV image (BGR format)
 
-    # Displace the x-coordinates by the wave effect
-    new_x = (x + wave).astype(int)
+    Returns:
+    - sepia_img: Image with sepia tone applied (BGR format)
+    """
+    # Define the sepia tone matrix
+    sepia_matrix = np.array([[0.393, 0.769, 0.189],
+                             [0.349, 0.686, 0.168],
+                             [0.272, 0.534, 0.131]])
 
-    # Clip the new_x values to stay within image bounds
-    new_x = np.clip(new_x, 0, w - 1)
+    # Apply the sepia tone transformation
+    sepia_img = cv2.transform(img, sepia_matrix)
 
-    # Create an output image with the same shape as the input
-    waved_img = np.zeros_like(img)
+    # Clip values to stay within the valid color range
+    sepia_img = np.clip(sepia_img, 0, 255).astype(np.uint8)
 
-    # Assign values from the original image to the new coordinates
-    waved_img[y, x] = img[y, new_x]
-    return waved_img
+    return sepia_img
+
+def invert_colors(img):
+    """
+    Invert the colors of the input image.
+
+    Parameters:
+    - img: OpenCV image (BGR format)
+
+    Returns:
+    - inverted_img: Image with inverted colors (BGR format)
+    """
+    inverted_img = cv2.bitwise_not(img)
+    return inverted_img
 
 if __name__ == "__main__":
     print('hello')
@@ -291,4 +319,5 @@ if __name__ == "__main__":
     height=480
     cap.set(3, width)  # Set width
     cap.set(4, height)  # Set height
+
     start(cap)
