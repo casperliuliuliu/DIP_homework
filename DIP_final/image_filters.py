@@ -26,7 +26,7 @@ def start(cap):
 
 
 
-def zoom_in(img, a, b):
+def apply_zoom_in(img, a=1.2, b=1.2):
     """
     Zoom in on the input image.
 
@@ -42,10 +42,10 @@ def zoom_in(img, a, b):
     original_height, original_width, _ = img.shape
 
     # Resize the cropped image back to the original size
-    processed_img = cv2.resize(img, (original_width*a, original_height*b))
+    processed_img = cv2.resize(img, (int(original_width*a), int(original_height*b)))
     return processed_img
 
-def zoom_out(img, a, b):
+def apply_zoom_out(img, a = 2, b = 2):
     """
     Zoom out on the input image.
 
@@ -68,7 +68,7 @@ def zoom_out(img, a, b):
     processed_img = cv2.resize(img, (new_width, new_height))
     return processed_img
 
-def flip_right_to_left(img):
+def apply_flip_right_to_left(img):
     """
     Flip the input image horizontally (right to left).
 
@@ -81,7 +81,7 @@ def flip_right_to_left(img):
     flipped_img = cv2.flip(img, 1)  # 1 denotes horizontal flip
     return flipped_img
 
-def flip_top_to_down(img):
+def apply_flip_top_to_down(img):
     """
     Flip the input image vertically (top to down).
 
@@ -94,7 +94,7 @@ def flip_top_to_down(img):
     flipped_img = cv2.flip(img, 0)  # 1 denotes horizontal flip
     return flipped_img
 
-def show_image_difference(current_img):
+def apply_show_image_difference(current_img):
     """
     Show the absolute difference between the current image and the last image.
 
@@ -119,7 +119,7 @@ def show_image_difference(current_img):
     last_img = current_img
     return diff_img
 
-def enlarge_line_effect(img):
+def apply_enlarge_line_effect(img):
     """
     Apply a line enlargement effect to the input image.
 
@@ -160,7 +160,7 @@ def enlarge_line_effect(img):
     enlarged_img[y[mask], x[mask]] = img[new_y, new_x]
     return enlarged_img
 
-def enlarge_effect_fixed(img, radius = 100):
+def apply_enlarge_effect_fixed(img, radius = 100):
     """
     Apply a fixed-radius enlargement effect to the input image.
 
@@ -254,7 +254,7 @@ def apply_oil_painting(img, templateSize=4, bucketSize=8, step=2):#templateSizeæ
                     oilImg[m+i,n+j] = (bucketsMean[0],bucketsMean[1],bucketsMean[2])
     return oilImg
 
-def colorOilPainting(img, templateSize=4, bucketSize=8, step=2):
+def apply_colorOilPainting(img, templateSize=4, bucketSize=8, step=2):
     # Convert the image to LAB color space
     lab_img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 
@@ -288,7 +288,7 @@ def colorOilPainting(img, templateSize=4, bucketSize=8, step=2):
     return oilImg
 
 
-def new_colorOilPainting(img, templateSize=4, bucketSize=8, step=2):
+def apply_new_colorOilPainting(img, templateSize=4, bucketSize=8, step=2):
     # Convert the image to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     gray_quantized = (gray * bucketSize // 256).astype(int)
@@ -352,7 +352,7 @@ def apply_mosaic_effect(img, block_size=10):
 
     return mosaic_img
 
-def reduce_effect_optimized(img, radius=100):
+def apply_reduce_effect_optimized(img, radius=100):
     """
     Apply a radial reduction effect to the input image in an optimized way.
 
@@ -389,7 +389,7 @@ def reduce_effect_optimized(img, radius=100):
     new_img = img[new_y, new_x]
     return new_img
 
-def grayscale_conversion(img):
+def apply_grayscale_conversion(img):
     """
     Convert the input image to grayscale.
 
@@ -402,7 +402,7 @@ def grayscale_conversion(img):
     grayscale_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return grayscale_img
 
-def sepia_tone(img):
+def apply_sepia_tone(img):
     """
     Apply a sepia tone filter to the input image.
 
@@ -425,7 +425,7 @@ def sepia_tone(img):
 
     return sepia_img
 
-def invert_colors(img):
+def apply_invert_colors(img):
     """
     Invert the colors of the input image.
 
@@ -437,7 +437,7 @@ def invert_colors(img):
     """
     inverted_img = cv2.bitwise_not(img)
     return inverted_img
-def posterize_effect(img, num_colors=16):
+def apply_posterize_effect(img, num_colors=16):
     """
     Reduce the number of colors in the image to create a poster-like effect.
 
@@ -468,7 +468,7 @@ def posterize_effect(img, num_colors=16):
 
     return posterized_img
 
-def bitwise_not_effect(img):
+def apply_bitwise_not_effect(img):
     """
     Invert some of the pixel values to create a solarization effect.
 
@@ -490,7 +490,7 @@ def bitwise_not_effect(img):
 
     return bitnot_img
 
-def solarize_effect(img, threshold=128):
+def apply_solarize_effect(img, threshold=128):
     """
     Invert some of the pixel values to create a solarization effect.
 
@@ -512,7 +512,7 @@ def solarize_effect(img, threshold=128):
 
     return solarized_img
 
-def emboss_effect(img):
+def apply_emboss_effect(img):
     """
     Highlight the edges of objects to give a 3D appearance.
 
@@ -536,7 +536,7 @@ def emboss_effect(img):
 
     return embossed_img
 
-def blur_effect(img, kernel_size=5):
+def apply_blur_effect(img, kernel_size=5):
     """
     Apply a blur effect to the image to smooth out details.
 
@@ -550,7 +550,7 @@ def blur_effect(img, kernel_size=5):
     blurred_img = cv2.GaussianBlur(img, (kernel_size, kernel_size), 0)
     return blurred_img
 
-def sharpen_effect(img):
+def apply_sharpen_effect(img):
     """
     Enhance the edges of objects to make them more defined.
 
@@ -919,24 +919,24 @@ def transform(img):
     - img: Image with testing filter (BGR format)
     """
     global last_img
-    # img = zoom_in(img, 1, 2)
-    # img = zoom_out(img, 2, 4)
-    # img = flip_right_to_left(img)
-    # img = flip_top_to_down(img)
-    # img = show_image_difference(img)
-    # img = enlarge_effect_fixed(img)
-    # img = reduce_effect_optimized(img)
+    # img = apply_zoom_in(img, 1, 2)
+    # img = apply_zoom_out(img, 2, 4)
+    # img = apply_flip_right_to_left(img)
+    # img = apply_flip_top_to_down(img)
+    # img = apply_show_image_difference(img)
+    # img = apply_enlarge_effect_fixed(img)
+    # img = apply_reduce_effect_optimized(img)
     # img = apply_mosaic_effect(img)
-    # img = enlarge_line_effect(img) # still got problems.
-    # img = grayscale_conversion(img)
-    # img = sepia_tone(img) # This is boring.
-    # img = invert_colors(img)
-    # img = posterize_effect(img)
-    # img = solarize_effect(img, 128)
-    # img = bitwise_not_effect(img)
-    # img = emboss_effect(img)
-    # img = blur_effect(img, 3)
-    # img = sharpen_effect(img)
+    # img = apply_enlarge_line_effect(img) # still got problems.
+    # img = apply_grayscale_conversion(img)
+    # img = apply_sepia_tone(img) # This is boring.
+    # img = apply_invert_colors(img)
+    # img = apply_posterize_effect(img)
+    # img = apply_solarize_effect(img, 128)
+    # img = apply_bitwise_not_effect(img)
+    # img = apply_emboss_effect(img)
+    # img = apply_blur_effect(img, 3)
+    # img = apply_sharpen_effect(img)
     # img = apply_oil_painting(img) # running too slow, need optimization
     # img = apply_sketch_effect(img)
     # img = apply_watercolor_effect(img)
