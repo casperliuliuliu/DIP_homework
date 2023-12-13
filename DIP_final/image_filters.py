@@ -3,6 +3,7 @@ from PIL import Image, ImageTk
 import numpy as np
 import math
 from sklearn.cluster import MiniBatchKMeans
+import colorsys
 last_img = 0
 def start(cap):
     while(True):
@@ -314,22 +315,6 @@ def new_colorOilPainting(img, templateSize=4, bucketSize=8, step=2):
             oil_img[i:i + step, j:j + step] = buckets_mean
 
     return oil_img
-def low_quality_effect(img, resolution = 10):
-    """
-    Apply a low-quality effect to the input image by reducing resolution.
-
-    Parameters:
-    - img: OpenCV image (BGR format)
-    - resolution: Resolution reduction factor
-
-    Returns:
-    - low_img: Image with reduced resolution (BGR format)
-    """
-    block_size = resolution
-    h, w, _ = img.shape
-    low_img = cv2.resize(img, (int(w/block_size),int(h/block_size)), interpolation=cv2.INTER_LINEAR)   # 根據縮小尺寸縮小
-    low_img = cv2.resize(low_img, (w,h), interpolation=cv2.INTER_NEAREST) 
-    return low_img
     
 def apply_mosaic_effect(img, block_size=10):
     """
@@ -602,21 +587,6 @@ def apply_sketch_effect(img):
     sketch = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
     return sketch
 
-def apply_cartoon_effect(img):
-    # 加载图像
-    image = img
-    # 将图像转换为灰度图像
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # 应用均值迁移滤波器以平滑图像
-    filtered = cv2.pyrMeanShiftFiltering(image, 20, 50)
-    #将平滑图像转换为灰度图像
-    gray_filtered = cv2.cvtColor(filtered, cv2.COLOR_BGR2GRAY)
-    # 应用边缘检测
-    edges = cv2.adaptiveThreshold(gray_filtered, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 5)
-    # 应用双边滤波器以增强边缘
-    colored_edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
-    cartoon = cv2.bitwise_and(filtered, colored_edges)
-    return cartoon
 
 def apply_dreamy_effect(img, blend_alpha=0.5):
     # 加载图像
@@ -628,6 +598,315 @@ def apply_dreamy_effect(img, blend_alpha=0.5):
     # 将图像与模糊图像混合
     dreamy = cv2.addWeighted(image, 1 - blend_alpha, blurred, blend_alpha, 0)
     return dreamy
+
+
+def apply_pencil_sketch(img, ksize=5):
+    # Convert the image to grayscale
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Apply a Gaussian blur to the grayscale image
+    blurred_img = cv2.GaussianBlur(gray_img, (ksize, ksize), 0)
+
+    # Invert the blurred image to create a pencil sketch effect
+    sketch_img = cv2.divide(gray_img, 255 - blurred_img, scale=256.0)
+
+    return cv2.cvtColor(cv2.merge([sketch_img, sketch_img, sketch_img]), cv2.COLOR_BGR2RGB)
+
+
+def apply_pixelate(img, block_size=10):
+    h, w = img.shape[:2]
+
+    # Resize the image to a small size
+    small_img = cv2.resize(img, (w // block_size, h // block_size), interpolation=cv2.INTER_LINEAR)
+
+    # Resize the small image back to the original size
+    pixelated_img = cv2.resize(small_img, (w, h), interpolation=cv2.INTER_NEAREST)
+
+    return pixelated_img
+
+def apply_cartoonize(img, num_down=2, num_bilateral=7):
+    """
+    Transform the image into a cartoon-style representation.
+
+    Parameters:
+    - img: Input image (BGR format)
+    - num_down: Number of downsampled levels
+    - num_bilateral: Number of bilateral filtering steps
+
+    Returns:
+    - cartoon_img: Cartoon-style image (BGR format)
+    """
+    # Downsample the image multiple times for faster processing
+    img_color = img
+    for _ in range(num_down):
+        img_color = cv2.pyrDown(img_color)
+
+    # Apply bilateral filter to reduce noise and smooth the image
+    for _ in range(num_bilateral):
+        img_color = cv2.bilateralFilter(img_color, d=9, sigmaColor=9, sigmaSpace=7)
+
+    # Upsample the image back to its original size
+    for _ in range(num_down):
+        img_color = cv2.pyrUp(img_color)
+
+    # Convert the image to grayscale
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Apply median blur to the grayscale image
+    img_blur = cv2.medianBlur(img_gray, 7)
+
+    # Create an edge mask using adaptive thresholding
+    edges = cv2.adaptiveThreshold(img_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 2)
+
+    # Combine the color and edge images to create the cartoon effect
+    cartoon_img = cv2.bitwise_and(img_color, img_color, mask=edges)
+
+    return cartoon_img
+
+
+def apply_gaussian_blur(img, sigma=1.0):
+    """
+    Apply a blur with a Gaussian filter to create a smoother appearance.
+
+    Parameters:
+    - img: Input image (BGR format)
+    - sigma: Standard deviation of the Gaussian filter
+
+    Returns:
+    - blurred_img: Blurred image (BGR format)
+    """
+    # Apply Gaussian blur to the image
+    blurred_img = cv2.GaussianBlur(img, (0, 0), sigmaX=sigma, sigmaY=sigma)
+
+    return blurred_img
+
+
+def apply_halftone(img, radius=3):
+    """
+    Simulate the appearance of halftone printing.
+
+    Parameters:
+    - img: Input image (BGR format)
+    - radius: Radius for the halftone effect
+
+    Returns:
+    - halftone_img: Halftone-style image (BGR format)
+    """
+    # Convert the image to grayscale
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Apply adaptive thresholding to create a binary halftone pattern
+    _, thresh = cv2.threshold(img_gray, 128, 255, cv2.THRESH_BINARY)
+
+    # Create a circular pattern for halftone using morphology
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * radius, 2 * radius))
+    halftone_img = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+
+    # Convert the binary halftone pattern to color format
+    halftone_img = cv2.cvtColor(halftone_img, cv2.COLOR_GRAY2BGR)
+
+    return halftone_img
+
+def apply_color_splash(img, color=(0, 0, 0)):
+    """
+    Convert the image to grayscale and highlight specific colored regions.
+
+    Parameters:
+    - img: Input image (BGR format)
+    - color: Color for highlighting specified regions (BGR format)
+
+    Returns:
+    - splash_img: Image with color splash effect (BGR format)
+    """
+    # Convert the image to grayscale
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Create a mask for non-black pixels in the original image
+    mask = gray_img > 128
+
+    # Create a copy of the original image and apply color splash
+    splash_img = img.copy()
+    splash_img[mask] = color
+
+    return splash_img
+
+
+def apply_vignette(img, strength=0.7):
+    """
+    Darken the corners of the image to draw attention to the center.
+
+    Parameters:
+    - img: Input image (BGR format)
+    - strength: Strength of the vignette effect
+
+    Returns:
+    - vignette_img: Image with vignette effect (BGR format)
+    """
+    # Create a circular mask for the vignette effect
+    h, w = img.shape[:2]
+    mask = np.zeros((h, w), dtype=np.uint8)
+    cv2.circle(mask, (w // 2, h // 2), int(min(h, w) * strength), 255, -1)
+
+    # Apply the mask to darken the corners
+    vignette_img = cv2.bitwise_and(img, img, mask=mask)
+
+    return vignette_img
+
+
+def apply_gradient_map(img, colors=None):
+    """
+    Apply a color gradient based on pixel intensity.
+
+    Parameters:
+    - img: Input image (BGR format)
+    - colors: List of colors for the gradient, default is None (uses rainbow colors)
+
+    Returns:
+    - gradient_img: Image with gradient map effect (BGR format)
+    """
+    # Convert the image to grayscale
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Create a default rainbow color map if colors are not provided
+    if colors is None:
+        colors = [tuple(int(255 * x) for x in colorsys.hsv_to_rgb(i / 360.0, 1.0, 1.0))
+                  for i in range(360)]
+
+    # Normalize pixel intensities to the range [0, 1]
+    normalized_intensity = gray_img / 255.0
+
+    # Map pixel intensities to colors based on the gradient
+    gradient_img = np.zeros_like(img)
+    for color, intensity in zip(colors, normalized_intensity.flatten()):
+        gradient_img += (img * intensity).astype(np.uint8)
+
+    return gradient_img
+
+def apply_lens_flare(img, flare_intensity=0.5, num_flare_circles=6):
+    """
+    Simulate lens flares to add a creative touch.
+
+    Parameters:
+    - img: Input image (BGR format)
+    - flare_intensity: Intensity of the lens flares, default is 0.5
+    - num_flare_circles: Number of flare circles to add, default is 6
+
+    Returns:
+    - flared_img: Image with lens flare effect (BGR format)
+    """
+    h, w, _ = img.shape
+    flared_img = img.copy()
+
+    # Generate random lens flare circles
+    for _ in range(num_flare_circles):
+        x = np.random.randint(0, w)
+        y = np.random.randint(0, h)
+        flare_color = np.random.rand(3) * 255 * flare_intensity
+        cv2.circle(flared_img, (x, y), np.random.randint(10, 100), flare_color, -1)
+
+    return flared_img
+
+
+def apply_double_exposure(img1, alpha=0.5):
+    """
+    Combine two images to create a double exposure effect.
+
+    Parameters:
+    - img1: First input image (BGR format)
+    - img2: Second input image (BGR format)
+    - alpha: Blending strength, where 0.0 means only img1, and 1.0 means only img2, default is 0.5
+
+    Returns:
+    - double_exposure_img: Image with double exposure effect (BGR format)
+    """
+    global last_img
+    if isinstance(last_img, int):
+        last_img = img1
+
+        return img1
+    
+    double_exposure_img = cv2.addWeighted(img1, alpha, last_img, 1 - alpha, 0)
+    last_img = img1
+
+    return double_exposure_img
+
+def apply_kaleidoscope(img, num_sections=6):
+    """
+    Replicate and mirror portions of the image to create a kaleidoscopic effect.
+
+    Parameters:
+    - img: Input image (BGR format)
+    - num_sections: Number of kaleidoscope sections, default is 6
+
+    Returns:
+    - kaleidoscope_img: Image with kaleidoscope effect (BGR format)
+    """
+    h, w, _ = img.shape
+    kaleidoscope_img = np.zeros_like(img)
+
+    # Split the image into sections and replicate/mirror them
+    section_width = w // num_sections
+    for i in range(num_sections):
+        section = img[:, i * section_width: (i + 1) * section_width, :]
+        kaleidoscope_img[:, i * section_width: (i + 1) * section_width, :] = cv2.flip(section, 1)
+
+    return kaleidoscope_img
+
+
+def apply_glitch_art(img, intensity=0.1):
+    """
+    Introduce digital glitches and artifacts for a futuristic and surreal look.
+
+    Parameters:
+    - img: Input image (BGR format)
+    - intensity: Intensity of the glitch effect, default is 0.1
+
+    Returns:
+    - glitched_img: Image with glitch art effect (BGR format)
+    """
+    h, w, _ = img.shape
+    glitched_img = img.copy()
+
+    # Introduce random glitches based on intensity using vectorized operations
+    num_glitches = int(intensity * h * w)
+    
+    # Generate random indices for glitches
+    y_indices = np.random.randint(0, h, num_glitches)
+    x_indices = np.random.randint(0, w, num_glitches)
+
+    # Generate random colors for glitches
+    glitch_colors = np.random.randint(0, 255, size=(num_glitches, 3))
+
+    # Apply glitches to the image
+    glitched_img[y_indices, x_indices, :] = glitch_colors
+
+    return glitched_img
+
+
+
+def apply_fractal_art_optimized(img, num_iterations=5):
+    """
+    Generate fractal patterns within the image for a complex and intricate appearance.
+
+    Parameters:
+    - img: Input image (BGR format)
+    - num_iterations: Number of fractal iterations, default is 5
+
+    Returns:
+    - fractal_img: Image with fractal art effect (BGR format)
+    """
+    h, w, _ = img.shape
+    fractal_img = img.copy()
+
+    # Generate fractal patterns within the image
+    for _ in range(num_iterations):
+        x = np.random.randint(0, w)
+        y = np.random.randint(0, h)
+        size = np.random.randint(10, 50)
+        color = tuple(np.random.randint(0, 255, size=(3,)).tolist())
+        cv2.circle(fractal_img, (x, y), size, color, -1)
+
+    return fractal_img
 
 def transform(img):
     """
@@ -648,7 +927,6 @@ def transform(img):
     # img = enlarge_effect_fixed(img)
     # img = reduce_effect_optimized(img)
     # img = apply_mosaic_effect(img)
-    # img = low_quality_effect(img, 10)
     # img = enlarge_line_effect(img) # still got problems.
     # img = grayscale_conversion(img)
     # img = sepia_tone(img) # This is boring.
@@ -660,11 +938,22 @@ def transform(img):
     # img = blur_effect(img, 3)
     # img = sharpen_effect(img)
     # img = apply_oil_painting(img) # running too slow, need optimization
-    # img = apply_cartoon_effect(img)
     # img = apply_sketch_effect(img)
     # img = apply_watercolor_effect(img)
     # img = apply_dreamy_effect(img)
-    
+    # img = apply_pencil_sketch(img)
+    # img = apply_pixelate(img)
+    # img = apply_cartoonize(img)
+    # img = apply_gaussian_blur(img)
+    # img = apply_halftone(img, 1)
+    # img = apply_color_splash(img)
+    # img = apply_vignette(img, 0.1)
+    # img = apply_gradient_map(img)
+    # img = apply_lens_flare(img)
+    # img = apply_double_exposure(img)
+    # img = apply_kaleidoscope(img,10)
+    # img = apply_glitch_art(img, 0.01)
+    img = apply_fractal_art_optimized(img,1 ) # this might be repeated
     return img
 if __name__ == "__main__":
     print('hello')
