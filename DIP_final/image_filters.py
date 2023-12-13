@@ -612,7 +612,6 @@ def apply_pencil_sketch(img, ksize=5):
 
     return cv2.cvtColor(cv2.merge([sketch_img, sketch_img, sketch_img]), cv2.COLOR_BGR2RGB)
 
-
 def apply_pixelate(img, block_size=10):
     h, w = img.shape[:2]
 
@@ -940,7 +939,7 @@ def transform(img):
     # img = apply_oil_painting(img) # running too slow, need optimization
     # img = apply_sketch_effect(img)
     # img = apply_watercolor_effect(img)
-    # img = apply_dreamy_effect(img)
+    img = apply_dreamy_effect(img)
     # img = apply_pencil_sketch(img)
     # img = apply_pixelate(img)
     # img = apply_cartoonize(img)
@@ -953,7 +952,7 @@ def transform(img):
     # img = apply_double_exposure(img)
     # img = apply_kaleidoscope(img,10)
     # img = apply_glitch_art(img, 0.01)
-    img = apply_fractal_art_optimized(img,1 ) # this might be repeated
+    # img = apply_fractal_art_optimized(img,1 ) # this might be repeated
     return img
 if __name__ == "__main__":
     print('hello')

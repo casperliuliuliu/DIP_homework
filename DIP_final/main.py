@@ -122,7 +122,7 @@ class VideoApp:
         if watercolor_effect.get():
             temp_img = apply_watercolor_effect(temp_img)
         if dreamy_effect.get():
-            temp_img = apply_dreamy_effect(temp_img)
+            temp_img = apply_gaussian_blur(temp_img)
         if pencil_sketch.get():
             temp_img = apply_pencil_sketch(temp_img)
         if pixelate.get():
@@ -217,108 +217,160 @@ class Func2:
         self.enlarge_effect_fixed_btn = tkmacosx.Button(self.btn_frame, text="Enlarge", command=lambda: change_color(self.enlarge_effect_fixed_btn, enlarge_effect), bg="white")
         self.enlarge_effect_fixed_btn.grid(row=0, column=2, padx=10)
         
-        # self.enlarge_effect_fixed_btn = self.create_button("Enlarge Effect Fixed", lambda: enlarge_effect_fixed(self.img))
-        # self.reduce_effect_optimized_btn = self.create_button("Reduce Effect Optimized", lambda: reduce_effect_optimized(self.img))
-        # self.apply_mosaic_effect_btn = self.create_button("Apply Mosaic Effect", lambda: apply_mosaic_effect(self.img))
-        # self.enlarge_line_effect_btn = self.create_button("Enlarge Line Effect", lambda: enlarge_line_effect(self.img))
-        # self.grayscale_conversion_btn = self.create_button("Grayscale Conversion", lambda: grayscale_conversion(self.img))
-        # self.sepia_tone_btn = self.create_button("Sepia Tone", lambda: sepia_tone(self.img))
-        # self.invert_colors_btn = self.create_button("Invert Colors", lambda: invert_colors(self.img))
-        # self.posterize_effect_btn = self.create_button("Posterize Effect", lambda: posterize_effect(self.img))
-        # self.solarize_effect_btn = self.create_button("Solarize Effect", lambda: solarize_effect(self.img, 128))
-        # self.bitwise_not_effect_btn = self.create_button("Bitwise Not Effect", lambda: bitwise_not_effect(self.img))
-        # self.emboss_effect_btn = self.create_button("Emboss Effect", lambda: emboss_effect(self.img))
-        # self.blur_effect_btn = self.create_button("Blur Effect", lambda: blur_effect(self.img, 3))
-        # self.sharpen_effect_btn = self.create_button("Sharpen Effect", lambda: sharpen_effect(self.img))
-        # self.apply_oil_painting_btn = self.create_button("Apply Oil Painting", lambda: apply_oil_painting(self.img))
-        # self.apply_sketch_effect_btn = self.create_button("Apply Sketch Effect", lambda: apply_sketch_effect(self.img))
-        # self.apply_watercolor_effect_btn = self.create_button("Apply Watercolor Effect", lambda: apply_watercolor_effect(self.img))
-        # self.apply_dreamy_effect_btn = self.create_button("Apply Dreamy Effect", lambda: apply_dreamy_effect(self.img))
-        # self.apply_pencil_sketch_btn = self.create_button("Apply Pencil Sketch", lambda: apply_pencil_sketch(self.img))
-        # self.apply_pixelate_btn = self.create_button("Apply Pixelate", lambda: apply_pixelate(self.img))
-        # self.apply_cartoonize_btn = self.create_button("Apply Cartoonize", lambda: apply_cartoonize(self.img))
-        # self.apply_gaussian_blur_btn = self.create_button("Apply Gaussian Blur", lambda: apply_gaussian_blur(self.img))
-        # self.apply_halftone_btn = self.create_button("Apply Halftone", lambda: apply_halftone(self.img, 1))
-        # self.apply_color_splash_btn = self.create_button("Apply Color Splash", lambda: apply_color_splash(self.img))
-        # self.apply_vignette_btn = self.create_button("Apply Vignette", lambda: apply_vignette(self.img, 0.1))
-        # self.apply_gradient_map_btn = self.create_button("Apply Gradient Map", lambda: apply_gradient_map(self.img))
-        # self.apply_lens_flare_btn = self.create_button("Apply Lens Flare", lambda: apply_lens_flare(self.img))
-        # self.apply_double_exposure_btn = self.create_button("Apply Double Exposure", lambda: apply_double_exposure(self.img))
-        # self.apply_kaleidoscope_btn = self.create_button("Apply Kaleidoscope", lambda: apply_kaleidoscope(self.img, 10))
-        # self.apply_glitch_art_btn = self.create_button("Apply Glitch Art", lambda: apply_glitch_art(self.img, 0.01))
-        # self.enlarge_effect_fixed_btn = self.create_button("Enlarge Effect Fixed", lambda: enlarge_effect_fixed(self.img))
-        # self.reduce_effect_optimized_btn = self.create_button("Reduce Effect Optimized", lambda: reduce_effect_optimized(self.img))
-        # self.apply_mosaic_effect_btn = self.create_button("Apply Mosaic Effect", lambda: apply_mosaic_effect(self.img))
-        # self.enlarge_line_effect_btn = self.create_button("Enlarge Line Effect", lambda: enlarge_line_effect(self.img))
-        # self.grayscale_conversion_btn = self.create_button("Grayscale Conversion", lambda: grayscale_conversion(self.img))
-        # self.sepia_tone_btn = self.create_button("Sepia Tone", lambda: sepia_tone(self.img))
-        # self.invert_colors_btn = self.create_button("Invert Colors", lambda: invert_colors(self.img))
-        # self.posterize_effect_btn = self.create_button("Posterize Effect", lambda: posterize_effect(self.img))
-        # self.solarize_effect_btn = self.create_button("Solarize Effect", lambda: solarize_effect(self.img, 128))
-        # self.bitwise_not_effect_btn = self.create_button("Bitwise Not Effect", lambda: bitwise_not_effect(self.img))
-        # self.emboss_effect_btn = self.create_button("Emboss Effect", lambda: emboss_effect(self.img))
-        # self.blur_effect_btn = self.create_button("Blur Effect", lambda: blur_effect(self.img, 3))
-        # self.sharpen_effect_btn = self.create_button("Sharpen Effect", lambda: sharpen_effect(self.img))
-        # self.apply_oil_painting_btn = self.create_button("Apply Oil Painting", lambda: apply_oil_painting(self.img))
-        # self.apply_sketch_effect_btn = self.create_button("Apply Sketch Effect", lambda: apply_sketch_effect(self.img))
-        # self.apply_watercolor_effect_btn = self.create_button("Apply Watercolor Effect", lambda: apply_watercolor_effect(self.img))
-        # self.apply_dreamy_effect_btn = self.create_button("Apply Dreamy Effect", lambda: apply_dreamy_effect(self.img))
-        # self.apply_pencil_sketch_btn = self.create_button("Apply Pencil Sketch", lambda: apply_pencil_sketch(self.img))
-        # self.apply_pixelate_btn = self.create_button("Apply Pixelate", lambda: apply_pixelate(self.img))
-        # self.apply_cartoonize_btn = self.create_button("Apply Cartoonize", lambda: apply_cartoonize(self.img))
-        # self.apply_gaussian_blur_btn = self.create_button("Apply Gaussian Blur", lambda: apply_gaussian_blur(self.img))
-        # self.apply_halftone_btn = self.create_button("Apply Halftone", lambda: apply_halftone(self.img, 1))
-        # self.apply_color_splash_btn = self.create_button("Apply Color Splash", lambda: apply_color_splash(self.img))
-        # self.apply_vignette_btn = self.create_button("Apply Vignette", lambda: apply_vignette(self.img, 0.1))
-        # self.apply_gradient_map_btn = self.create_button("Apply Gradient Map", lambda: apply_gradient_map(self.img))
-        # self.apply_lens_flare_btn = self.create_button("Apply Lens Flare", lambda: apply_lens_flare(self.img))
-        # self.apply_double_exposure_btn = self.create_button("Apply Double Exposure", lambda: apply_double_exposure(self.img))
-        # self.apply_kaleidoscope_btn = self.create_button("Apply Kaleidoscope", lambda: apply_kaleidoscope(self.img, 10))
-        # self.apply_glitch_art_btn = self.create_button("Apply Glitch Art", lambda: apply_glitch_art(self.img, 0.01))
+        self.reduce_effect_optimized_btn = tkmacosx.Button(self.btn_frame, text="Reduce", command=lambda: change_color(self.reduce_effect_optimized_btn, reduce_effect), bg="white")
+        self.reduce_effect_optimized_btn.grid(row=0, column=3, padx=10)
 
-        # self.zoom_out_btn.grid(row=0, column=2, padx=10)
-        # self.flip_right_to_left_btn.grid(row=0, column=3, padx=10)
-        # self.flip_top_to_down_btn.grid(row=0, column=3, padx=10)
-        # self.show_image_difference_btn.grid(row=0, column=4, padx=10)
-        # self.enlarge_effect_fixed_btn.grid(row=0, column=5, padx=10)
-        # self.reduce_effect_optimized_btn.grid(row=0, column=6, padx=10)
-        # self.apply_mosaic_effect_btn.grid(row=0, column=7, padx=10)
-        # self.enlarge_line_effect_btn.grid(row=0, column=8, padx=10)
-        # self.grayscale_conversion_btn.grid(row=0, column=9, padx=10)
-        # self.sepia_tone_btn.grid(row=0, column=10, padx=10)
-        # self.invert_colors_btn.grid(row=0, column=11, padx=10)
-        # self.posterize_effect_btn.grid(row=0, column=12, padx=10)
-        # self.solarize_effect_btn.grid(row=0, column=13, padx=10)
-        # self.bitwise_not_effect_btn.grid(row=0, column=14, padx=10)
-        # self.emboss_effect_btn.grid(row=0, column=15, padx=10)
-        # self.blur_effect_btn.grid(row=0, column=16, padx=10)
-        # self.sharpen_effect_btn.grid(row=0, column=17, padx=10)
-        # self.apply_oil_painting_btn.grid(row=0, column=18, padx=10)
-        # self.apply_sketch_effect_btn.grid(row=0, column=19, padx=10)
-        # self.apply_watercolor_effect_btn.grid(row=0, column=20, padx=10)
-        # self.apply_dreamy_effect_btn.grid(row=0, column=21, padx=10)
-        # self.apply_pencil_sketch_btn.grid(row=0, column=22, padx=10)
-        # self.apply_pixelate_btn.grid(row=0, column=23, padx=10)
-        # self.apply_cartoonize_btn.grid(row=0, column=24, padx=10)
-        # self.apply_gaussian_blur_btn.grid(row=0, column=25, padx=10)
-        # self.apply_halftone_btn.grid(row=0, column=26, padx=10)
-        # self.apply_color_splash_btn.grid(row=0, column=27, padx=10)
-        # self.apply_vignette_btn.grid(row=0, column=28, padx=10)
-        # self.apply_gradient_map_btn.grid(row=0, column=29, padx=10)
-        # self.apply_lens_flare_btn.grid(row=0, column=30, padx=10)
-        # self.apply_double_exposure_btn.grid(row=0, column=31, padx=10)
-        # self.apply_kaleidoscope_btn.grid(row=0, column=32, padx=10)
-        # self.apply_glitch_art_btn.grid(row=0, column=33, padx=10)
+        self.apply_mosaic_effect_btn = tkmacosx.Button(self.btn_frame, text="Mosaic", command=lambda: change_color(self.apply_mosaic_effect_btn, mosaic_effect), bg="white")
+        self.apply_mosaic_effect_btn.grid(row=0, column=4, padx=10)        
 
+        # # self.enlarge_line_effect_btn = self.create_button("Enlarge Line Effect", lambda: enlarge_line_effect(self.img))
+        # self.reduce_effect_optimized_btn = tkmacosx.Button(self.btn_frame, text="Enlarge", command=lambda: change_color(self.reduce_effect_optimized_btn, enlarge_effect), bg="white")
+        # self.reduce_effect_optimized_btn.grid(row=0, column=2, padx=10)     
+          
+        self.grayscale_conversion_btn = tkmacosx.Button(self.btn_frame, text="Grayscale", command=lambda: change_color(self.grayscale_conversion_btn, grayscale_conversion), bg="white")
+        self.grayscale_conversion_btn.grid(row=0, column=5, padx=10)
+
+        self.sepia_tone_btn = tkmacosx.Button(self.btn_frame, text="Sepia", command=lambda: change_color(self.sepia_tone_btn, sepia_tone), bg="white")
+        self.sepia_tone_btn.grid(row=0, column=6, padx=10)
+
+        self.invert_colors_btn = tkmacosx.Button(self.btn_frame, text="Invert color", command=lambda: change_color(self.invert_colors_btn, invert_colors), bg="white")
+        self.invert_colors_btn.grid(row=1, column=0, padx=10) 
+
+
+        self.posterize_effect_btn = tkmacosx.Button(self.btn_frame, text="Poster", command=lambda: change_color(self.posterize_effect_btn, posterize_effect), bg="white")
+        self.posterize_effect_btn.grid(row=1, column=1, padx=10)
+
+        self.solarize_effect_btn = tkmacosx.Button(self.btn_frame, text="Solar", command=lambda: change_color(self.solarize_effect_btn, solarize_effect), bg="white")
+        self.solarize_effect_btn.grid(row=1, column=2, padx=10)
+
+        self.bitwise_not_effect_btn = tkmacosx.Button(self.btn_frame, text="Bitwise", command=lambda: change_color(self.bitwise_not_effect_btn, bitwise_not_effect), bg="white")
+        self.bitwise_not_effect_btn.grid(row=1, column=3, padx=10)      
+
+        self.emboss_effect_btn = tkmacosx.Button(self.btn_frame, text="Emboss", command=lambda: change_color(self.emboss_effect_btn, emboss_effect), bg="white")
+        self.emboss_effect_btn.grid(row=1, column=4, padx=10)
+
+        self.blur_effect_btn = tkmacosx.Button(self.btn_frame, text="Blur", command=lambda: change_color(self.blur_effect_btn, blur_effect), bg="white")
+        self.blur_effect_btn.grid(row=1, column=5, padx=10)
+
+        self.sharpen_effect_btn = tkmacosx.Button(self.btn_frame, text="Sharpen", command=lambda: change_color(self.sharpen_effect_btn, sharpen_effect), bg="white")
+        self.sharpen_effect_btn.grid(row=1, column=6, padx=10)
+
+        self.apply_oil_painting_btn = tkmacosx.Button(self.btn_frame, text="Oil paint", command=lambda: change_color(self.apply_oil_painting_btn, oil_painting), bg="white")
+        self.apply_oil_painting_btn.grid(row=2, column=0, padx=10)   
+
+        self.apply_sketch_effect_btn = tkmacosx.Button(self.btn_frame, text="Sketch", command=lambda: change_color(self.apply_sketch_effect_btn, sketch_effect), bg="white")
+        self.apply_sketch_effect_btn.grid(row=2, column=1, padx=10)        
+
+        self.apply_watercolor_effect_btn = tkmacosx.Button(self.btn_frame, text="Water color", command=lambda: change_color(self.apply_watercolor_effect_btn, watercolor_effect), bg="white")
+        self.apply_watercolor_effect_btn.grid(row=2, column=2, padx=10)        
+
+        self.apply_dreamy_effect_btn = tkmacosx.Button(self.btn_frame, text="Dreamy", command=lambda: change_color(self.apply_dreamy_effect_btn, dreamy_effect), bg="white")
+        self.apply_dreamy_effect_btn.grid(row=2, column=3, padx=10)
+
+        self.apply_pencil_sketch_btn = tkmacosx.Button(self.btn_frame, text="Pencil", command=lambda: change_color(self.apply_pencil_sketch_btn, pencil_sketch), bg="white")
+        self.apply_pencil_sketch_btn.grid(row=2, column=4, padx=10)
+
+        self.apply_cartoonize_btn = tkmacosx.Button(self.btn_frame, text="Cartoon", command=lambda: change_color(self.apply_cartoonize_btn, cartoonize), bg="white")
+        self.apply_cartoonize_btn.grid(row=2, column=5, padx=10)
+
+        self.apply_pixelate_btn = tkmacosx.Button(self.btn_frame, text="Pixel", command=lambda: change_color(self.apply_pixelate_btn, pixelate), bg="white")
+        self.apply_pixelate_btn.grid(row=2, column=6, padx=10)
+
+        self.apply_gaussian_blur_btn = tkmacosx.Button(self.btn_frame, text="G blur", command=lambda: change_color(self.apply_gaussian_blur_btn, gaussian_blur), bg="white")
+        self.apply_gaussian_blur_btn.grid(row=3, column=0, padx=10)
+
+        self.apply_halftone_btn = tkmacosx.Button(self.btn_frame, text="Halftone", command=lambda: change_color(self.apply_halftone_btn, halftone), bg="white")
+        self.apply_halftone_btn.grid(row=3, column=1, padx=10)      
+
+        self.apply_color_splash_btn = tkmacosx.Button(self.btn_frame, text="Splash", command=lambda: change_color(self.apply_color_splash_btn, color_splash), bg="white")
+        self.apply_color_splash_btn.grid(row=3, column=2, padx=10)
+
+        self.apply_vignette_btn = tkmacosx.Button(self.btn_frame, text="Vignette", command=lambda: change_color(self.apply_vignette_btn, vignette), bg="white")
+        self.apply_vignette_btn.grid(row=3, column=3, padx=10)     
+
+        self.apply_gradient_map_btn = tkmacosx.Button(self.btn_frame, text="Gradient", command=lambda: change_color(self.apply_gradient_map_btn, gradient_map), bg="white")
+        self.apply_gradient_map_btn.grid(row=3, column=4, padx=10)
+
+        self.apply_lens_flare_btn = tkmacosx.Button(self.btn_frame, text="Flare", command=lambda: change_color(self.apply_lens_flare_btn, lens_flare), bg="white")
+        self.apply_lens_flare_btn.grid(row=3, column=5, padx=10)   
+
+        self.apply_double_exposure_btn = tkmacosx.Button(self.btn_frame, text="Double exp", command=lambda: change_color(self.apply_double_exposure_btn, double_exposure), bg="white")
+        self.apply_double_exposure_btn.grid(row=3, column=6, padx=10)
+
+        self.apply_kaleidoscope_btn = tkmacosx.Button(self.btn_frame, text="Kalei", command=lambda: change_color(self.apply_kaleidoscope_btn, kaleidoscope), bg="white")
+        self.apply_kaleidoscope_btn.grid(row=4, column=0, padx=10)   
+
+        self.apply_glitch_art_btn = tkmacosx.Button(self.btn_frame, text="Glitch", command=lambda: change_color(self.apply_glitch_art_btn, glitch_art), bg="white")
+        self.apply_glitch_art_btn.grid(row=4, column=1, padx=10)   
 
 
     def recover(self):
         image_difference.set(0)
         self.show_image_difference_btn['bg'] = "white"
-        # zoom_out.set(0)
-        # self.zoom_out_btn['bg'] = "white"
-        # flip_rl.set(0)
-        # self.flip_right_to_left_btn['bg'] = "white"
+        enlarge_effect.set(0)
+        self.enlarge_effect_fixed_btn['bg'] = "white"
+        reduce_effect.set(0)
+        self.reduce_effect_optimized_btn['bg'] = "white"
+        mosaic_effect.set(0)
+        self.apply_mosaic_effect_btn['bg'] = "white"
+        grayscale_conversion.set(0)
+        self.grayscale_conversion_btn['bg'] = "white"
+        sepia_tone.set(0)
+        self.sepia_tone_btn['bg'] = "white"
+        invert_colors.set(0)
+        self.invert_colors_btn['bg'] = "white"
+        posterize_effect.set(0)
+        self.posterize_effect_btn['bg'] = "white"
+        solarize_effect.set(0)
+        self.solarize_effect_btn['bg'] = "white"
+        bitwise_not_effect.set(0)
+        self.bitwise_not_effect_btn['bg'] = "white"
+        emboss_effect.set(0)
+        self.emboss_effect_btn['bg'] = "white"
+        blur_effect.set(0)
+        self.blur_effect_btn['bg'] = "white"
+        sharpen_effect.set(0)
+        self.sharpen_effect_btn['bg'] = "white"
+        oil_painting.set(0)
+        self.apply_oil_painting_btn['bg'] = "white"
+        sketch_effect.set(0)
+        self.apply_sketch_effect_btn['bg'] = "white"
+        watercolor_effect.set(0)
+        self.apply_watercolor_effect_btn['bg'] = "white"
+        dreamy_effect.set(0)
+        self.apply_dreamy_effect_btn['bg'] = "white"
+        pencil_sketch.set(0)
+        self.apply_pencil_sketch_btn['bg'] = "white"
+        cartoonize.set(0)
+        self.apply_cartoonize_btn['bg'] = "white"
+        pixelate.set(0)
+        self.apply_pixelate_btn['bg'] = "white"
+        gaussian_blur.set(0)
+        self.apply_gaussian_blur_btn['bg'] = "white"
+
+        halftone.set(0)
+        self.apply_halftone_btn['bg'] = "white"
+
+        color_splash.set(0)
+        self.apply_color_splash_btn['bg'] = "white"
+
+        vignette.set(0)
+        self.apply_vignette_btn['bg'] = "white"
+        
+        gradient_map.set(0)
+        self.apply_gradient_map_btn['bg'] = "white"
+
+        lens_flare.set(0)
+        self.apply_lens_flare_btn['bg'] = "white"
+
+        double_exposure.set(0)
+        self.apply_double_exposure_btn['bg'] = "white"
+
+        kaleidoscope.set(0)
+        self.apply_kaleidoscope_btn['bg'] = "white"
+
+        glitch_art.set(0)
+        self.apply_glitch_art_btn['bg'] = "white"
 
 # Function to initialize global variables
 def initialize_global_vars():
